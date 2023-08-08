@@ -9,7 +9,7 @@ const summarize = async (topic) => {
             method: "POST",
             headers: {
                 "content-type": "application/json",
-                Authorization: `Bearer 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`,
+                Authorization: `Bearer .`,
             },
         }
     )
