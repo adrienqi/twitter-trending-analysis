@@ -1,11 +1,21 @@
-#summary-btn {
+.gen-btn {
     cursor: pointer;
     position: absolute;
-    height: 30px;
-    width: 30px;
+    height: 34px;
+    width: 34px;
 }
 
-#summary-btn:hover {
+.gen-btn:hover {
     cursor: pointer;
     background: #000010;
+    border-radius: 360px;
+}
+
+.gen-btn-inner {
+    position: absolute;
+    top: 10px;
+    left: 5px;
+    width: 24px;
+    height: 24px;
+    filter: invert(50%);
 }
