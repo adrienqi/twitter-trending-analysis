@@ -1,0 +1,11 @@
+#summary-btn {
+    cursor: pointer;
+    position: absolute;
+    height: 30px;
+    width: 30px;
+}
+
+#summary-btn:hover {
+    cursor: pointer;
+    background: #000010;
+}
