@@ -47,21 +47,23 @@ function appendSummaryButton(topic) {
             </svg>
         </div>`
     )
+    
+    // add click event listener event to btn
+    // TODO: overlapping buttons (clicks into the topic, doesn't generate summary)
+    topic.parentNode
+        .querySelector("#generate-summary-button")
+        .addEventListener("click", async function() {
+            if (!openaiClient) return;
+            const completion = await openaiClient.createCompletion({
+                model: 'gpt-3.5-turbo',
+                prompt: `Please provide a 2 sentence summary of ${topic.textContent}`,
+                temperature: 0.6
+            })
+            const button = topic.parentNode.querySelector("#generate-summary-button")
+            if (button) {
+                topic.parentNode.removeChild(button)
+            }
+            topic.textContent += "\n" + completion.data.choices[0].text;
+        })
 }
 
-// add click event listener event to btn
-topic.parentNode
-    .querySelector("#generate-summary-button")
-    .addEventListener("click", async function() {
-        if (!openaiClient) return;
-        const completion = await openaiClient.createCompletion({
-            model: 'gpt-3.5-turbo',
-            prompt: `Please provide a 2 sentence summary of ${topic.textContent}`,
-            temperature: 0.6
-        })
-        const button = topic.parentNode.querySelector("#generate-summary-button")
-        if (button) {
-            topic.parentNode.removeChild(button)
-        }
-        topic.textContent += "\n" + completion.data.choices[0].text;
-    })
