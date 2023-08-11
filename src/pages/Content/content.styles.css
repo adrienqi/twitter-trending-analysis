@@ -1,6 +1,6 @@
 .gen-btn {
     cursor: pointer;
-    position: absolute;
+    position: relative;
     height: 34px;
     width: 34px;
 }
@@ -11,8 +11,8 @@
     border-radius: 360px;
 }
 
-.gen-btn-inner {
-    position: absolute;
+#gen-btn-inner {
+    position: relative;
     top: 10px;
     left: 5px;
     width: 24px;
