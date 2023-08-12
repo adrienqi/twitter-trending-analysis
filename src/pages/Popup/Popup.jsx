@@ -26,6 +26,7 @@ const Popup = () => {
           onChange={(e) => {
             setApiKey(e.target.value);
             chrome.storage.local.set({openaiApiKey: e.target.value})
+            // console.log("checking popup: " + e.target.value);
           }}
         />
         <div id="apiKeyHelp" className="form-text">

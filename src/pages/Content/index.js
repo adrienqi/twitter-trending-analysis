@@ -1,33 +1,41 @@
-const { Configuration, OpenAIApi } = require('openai')
+let apiKey = "";
 
-let openaiClient;
-
-chrome.storage.local.get(['openaiApiKey']).then(({ openaiApiKey }) => {
-    const configuration = new Configuration({
-        apiKey: openaiApiKey,
-    })
-    openaiClient = new OpenAIApi(configuration)
-})
-
-// chrome local storage api allows listening to storage events
-// add listerer
+const summarize = async (topic) => {
+    console.log("check in fetch: " + apiKey)
+    await fetch( `https://api.openai.com/v1/chat/completions`,
+        {
+            body: JSON.stringify({
+                model: 'gpt-3.5-turbo',
+                messages: [{ role: 'user', content: `Please provide a 2 sentence summary of ${topic}`}],
+            }),    
+            method: "POST",
+            headers: {
+                "content-type": "application/json",
+                Authorization: `Bearer ${apiKey}`,
+            },
+        }
+    ).then((response) => {
+        if (response.ok) {
+            response.json().then((json) => {
+                console.log(json.choices[0].message.content)
+                return json.choices[0].message.content
+            });
+        }
+    }).catch(console.error)
+}
 
 chrome.storage.onChanged.addListener((changes) => {
     for (let [key, { newValue }] of Object.entries(changes)) {
         if (key != 'openaiApiKey') continue;
-        openaiClient = new OpenAIApi(
-            new Configuration({
-                apiKey: newValue,
-            })
-        )
+        apiKey = newValue
+        console.log("in listener: " + apiKey)
     }
 })
-
 
 //TODO: selector id changes with light mode/dim mode/dark mode
 setInterval(() => {
     const trendingList = document.querySelectorAll(".css-901oao.r-1nao33i.r-37j5jr.r-a023e6.r-b88u0q.r-rjixqe.r-1bymd8e.r-bcqeeo.r-qvutc0");
-    console.log(trendingList)
+    // console.log(trendingList)
 
     for (const topic of trendingList) {
         if (topic.parentNode && topic.parentNode.querySelector('#generate-summary-button') == null) {
@@ -53,17 +61,15 @@ function appendSummaryButton(topic) {
     topic.parentNode
         .querySelector("#generate-summary-button")
         .addEventListener("click", async function() {
-            if (!openaiClient) return;
-            const completion = await openaiClient.createCompletion({
-                model: 'gpt-3.5-turbo',
-                prompt: `Please provide a 2 sentence summary of ${topic.textContent}`,
-                temperature: 0.6
-            })
+            console.log("check summarize param: " + topic.textContent)
             const button = topic.parentNode.querySelector("#generate-summary-button")
             if (button) {
                 topic.parentNode.removeChild(button)
             }
-            topic.textContent += "\n" + completion.data.choices[0].text;
+            
+            const output = await summarize(topic.textContent)
+            console.log("response: " + output);
+            topic.textContent += "\n" + output;
         })
 }
 
