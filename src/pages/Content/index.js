@@ -2,7 +2,7 @@ let apiKey = "";
 
 const summarize = async (topic) => {
     console.log("check in fetch: " + apiKey)
-    await fetch( `https://api.openai.com/v1/chat/completions`,
+    const response  = await fetch( `https://api.openai.com/v1/chat/completions`,
         {
             body: JSON.stringify({
                 model: 'gpt-3.5-turbo',
@@ -14,14 +14,28 @@ const summarize = async (topic) => {
                 Authorization: `Bearer ${apiKey}`,
             },
         }
-    ).then((response) => {
-        if (response.ok) {
-            response.json().then((json) => {
-                console.log(json.choices[0].message.content)
-                return json.choices[0].message.content
-            });
-        }
-    }).catch(console.error)
+    )
+
+    if (!response.ok) {
+        throw new Error("response was not OK")
+    }
+
+    const output = await response.json()
+
+    console.log(output.choices[0].message.content)
+    return output.choices[0].message.content
+
+    // .then((response) => {
+    //     if (response.ok) {
+    //         response.json().then((json) => {
+    //             console.log("return check: " + json.choices[0].message.content)
+    //             return json.choices[0].message.content
+    //         });
+    //     }
+    // }).catch(console.error)
+    // .catch(err => { // ex. syntax for err handling
+    //     navigate(LOGINSCREEN);
+    //   });
 }
 
 chrome.storage.onChanged.addListener((changes) => {
