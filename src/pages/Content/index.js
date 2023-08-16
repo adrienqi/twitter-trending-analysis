@@ -1,13 +1,16 @@
+const { By, Builder, Browser } = require('selenium-webdriver');
+const { suite } = require('selenium-webdriver/testing');
+
 let apiKey = "";
 
 const summarize = async (topic) => {
     console.log("check in fetch: " + apiKey)
-    const response  = await fetch( `https://api.openai.com/v1/chat/completions`,
+    const response = await fetch(`https://api.openai.com/v1/chat/completions`,
         {
             body: JSON.stringify({
                 model: 'gpt-3.5-turbo',
-                messages: [{ role: 'user', content: `Please provide a 2 sentence summary of ${topic}`}],
-            }),    
+                messages: [{ role: 'user', content: `Please provide a 2 sentence summary of ${topic}` }],
+            }),
             method: "POST",
             headers: {
                 "content-type": "application/json",
@@ -24,18 +27,6 @@ const summarize = async (topic) => {
 
     console.log(output.choices[0].message.content)
     return output.choices[0].message.content
-
-    // .then((response) => {
-    //     if (response.ok) {
-    //         response.json().then((json) => {
-    //             console.log("return check: " + json.choices[0].message.content)
-    //             return json.choices[0].message.content
-    //         });
-    //     }
-    // }).catch(console.error)
-    // .catch(err => { // ex. syntax for err handling
-    //     navigate(LOGINSCREEN);
-    //   });
 }
 
 chrome.storage.onChanged.addListener((changes) => {
@@ -52,15 +43,13 @@ setInterval(() => {
     // console.log(trendingList)
 
     for (const topic of trendingList) {
-        if (topic.parentNode && topic.parentNode.querySelector('#generate-summary-button') == null) {
+        if (topic.parentNode && topic.parentNode.querySelector('#generate-summary-button', trendingList) == null) {
             appendSummaryButton(topic);
         }
     }
 }, 1000);
 
-// TODO:
-// button to prompt gpt under each topic
-function appendSummaryButton(topic) {
+function appendSummaryButton(topic, trendingList) {
     topic.insertAdjacentHTML(
         'afterend',
         `<div id = "generate-summary-button" class="gen-btn">
@@ -69,18 +58,25 @@ function appendSummaryButton(topic) {
             </svg>
         </div>`
     )
-    
-    // add click event listener event to btn
-    // TODO: overlapping buttons (clicks into the topic, doesn't generate summary)
+
     topic.parentNode
         .querySelector("#generate-summary-button")
-        .addEventListener("click", async function() {
+        .addEventListener("click", async function () {
             console.log("check summarize param: " + topic.textContent)
             const button = topic.parentNode.querySelector("#generate-summary-button")
             if (button) {
                 topic.parentNode.removeChild(button)
             }
             
+            (async function selenium() {
+                let driver = await new Builder().forBrowser('chrome').build();
+
+                await driver.get('https://twitter.com/explore/tabs/trending');
+
+                // https://stackoverflow.com/questions/70300144/find-href-on-web-page
+                
+            })
+
             const output = await summarize(topic.textContent)
             console.log("response: " + output);
             topic.textContent += "\n" + output;
