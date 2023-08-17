@@ -1,6 +1,3 @@
-const { By, Builder, Browser } = require('selenium-webdriver');
-const { suite } = require('selenium-webdriver/testing');
-
 let apiKey = "";
 
 const summarize = async (topic) => {
@@ -33,23 +30,33 @@ chrome.storage.onChanged.addListener((changes) => {
     for (let [key, { newValue }] of Object.entries(changes)) {
         if (key != 'openaiApiKey') continue;
         apiKey = newValue
-        console.log("in listener: " + apiKey)
+        console.log(apiKey)
     }
 })
 
+var globalList = [];
+var prevList = [];
 //TODO: selector id changes with light mode/dim mode/dark mode
-setInterval(() => {
-    const trendingList = document.querySelectorAll(".css-901oao.r-1nao33i.r-37j5jr.r-a023e6.r-b88u0q.r-rjixqe.r-1bymd8e.r-bcqeeo.r-qvutc0");
-    // console.log(trendingList)
+var intervalID = setInterval(() => {
+    var trendingList = document.querySelectorAll(".css-901oao.r-1nao33i.r-37j5jr.r-a023e6.r-b88u0q.r-rjixqe.r-1bymd8e.r-bcqeeo.r-qvutc0");
 
-    for (const topic of trendingList) {
-        if (topic.parentNode && topic.parentNode.querySelector('#generate-summary-button', trendingList) == null) {
-            appendSummaryButton(topic);
+    console.log(trendingList.length + " : " + prevList.length)
+
+    if (trendingList.length != prevList.length) {
+        for (const topic of trendingList) {
+            if (topic.parentNode && topic.parentNode.querySelector('#generate-summary-button', trendingList) == null) {
+                console.log(`appendSummaryButton(${topic.textContent})`)
+                appendSummaryButton(topic);
+            }
+            prevList = trendingList;
         }
     }
+    prevList = trendingList;
+    console.log(`prevList.length = ${prevList.length}`)
 }, 1000);
 
-function appendSummaryButton(topic, trendingList) {
+function appendSummaryButton(topic) {
+    console.log(`adding button to ${topic}`)
     topic.insertAdjacentHTML(
         'afterend',
         `<div id = "generate-summary-button" class="gen-btn">
@@ -63,19 +70,8 @@ function appendSummaryButton(topic, trendingList) {
         .querySelector("#generate-summary-button")
         .addEventListener("click", async function () {
             console.log("check summarize param: " + topic.textContent)
-            const button = topic.parentNode.querySelector("#generate-summary-button")
-            if (button) {
-                topic.parentNode.removeChild(button)
-            }
-            
-            (async function selenium() {
-                let driver = await new Builder().forBrowser('chrome').build();
-
-                await driver.get('https://twitter.com/explore/tabs/trending');
-
-                // https://stackoverflow.com/questions/70300144/find-href-on-web-page
-                
-            })
+            // TODO: generate summary button reappearing bc setinterval is still running
+            topic.parentNode.querySelector("#generate-summary-button").remove()
 
             const output = await summarize(topic.textContent)
             console.log("response: " + output);
