@@ -1,0 +1,21 @@
+.gen-btn {
+    cursor: pointer;
+    position: relative;
+    height: 34px;
+    width: 34px;
+}
+
+.gen-btn:hover {
+    cursor: pointer;
+    background: #000010;
+    border-radius: 361px;
+}
+
+.gen-btn-inner {
+    position: relative;
+    top: 10px;
+    left: 5px;
+    width: 24px;
+    height: 24px;
+    filter: invert(50%);
+}

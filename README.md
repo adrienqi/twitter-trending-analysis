@@ -1,0 +1,3 @@
+wip...
+
+![](https://github.com/adrienqi/twitter-trending-analysis/blob/new/msedge_GqVYOZZLQV.gif)
